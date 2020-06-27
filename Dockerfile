@@ -10,7 +10,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install composer.
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php --install-dir=bin --filename=composer && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     rm composer-setup.php && \
     echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> /etc/profile && \
     composer global require hirak/prestissimo
