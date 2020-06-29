@@ -10,7 +10,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install additional dependencies.
 RUN set -eux; \
-    apt-get update && apt-get install -y git libmemcached-dev zip zlib1g-dev \
+    apt-get update && apt-get install -y git libmemcached-dev mariadb-client rsync zip zlib1g-dev \
     && pecl install memcached \
     && docker-php-ext-enable memcached; \
     apt-get purge -y --auto-remove zlib1g-dev; \
@@ -24,5 +24,8 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> /etc/profile && \
     composer global require hirak/prestissimo
 
-# Replace docroot.
-RUN sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf
+# Web server config.
+RUN sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf && \
+    cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
+    echo "memory_limit = -1" > /usr/local/etc/php/php.ini && \
+    mkdir -p ~/.ssh && ln -s /run/secrets/host_ssh_key ~/.ssh/id_rsa
