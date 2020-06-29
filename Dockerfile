@@ -23,3 +23,6 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     rm composer-setup.php && \
     echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> /etc/profile && \
     composer global require hirak/prestissimo
+
+# Replace docroot.
+RUN sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf
