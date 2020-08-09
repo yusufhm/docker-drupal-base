@@ -10,18 +10,25 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install additional dependencies.
 RUN set -eux; \
-    apt-get update && apt-get install -y git libmemcached-dev mariadb-client rsync zip zlib1g-dev \
+    apt-get update && apt-get install -y git libmemcached-dev mariadb-client rsync sudo zip zlib1g-dev \
     && pecl install memcached \
     && docker-php-ext-enable memcached; \
     apt-get purge -y --auto-remove zlib1g-dev; \
     rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install bcmath
 
+# Create drupal user.
+RUN adduser --disabled-password --gecos "" --uid 1000 drupal && \
+    usermod -aG sudo drupal && \
+    echo "drupal     ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER drupal
+
 # Install composer.
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     rm composer-setup.php && \
-    echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> /etc/profile && \
+    echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' | sudo tee -a /etc/profile && \
     composer global require hirak/prestissimo
 
 # Install nvm.
@@ -32,7 +39,9 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | b
     nvm install stable --lts
 
 # Web server config.
-RUN sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf && \
-    cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-    echo "memory_limit = -1" > /usr/local/etc/php/php.ini && \
+RUN sudo sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf && \
+    sudo cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
+    echo "memory_limit = -1" | sudo tee /usr/local/etc/php/php.ini && \
     mkdir -p ~/.ssh && ln -s /run/secrets/host_ssh_key ~/.ssh/id_rsa
+
+CMD ["sudo", "apache2-foreground"]
