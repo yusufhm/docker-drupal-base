@@ -24,6 +24,13 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> /etc/profile && \
     composer global require hirak/prestissimo
 
+# Install nvm.
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash && \
+    export NVM_DIR="$HOME/.nvm" \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  \
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
+    nvm install stable --lts
+
 # Web server config.
 RUN sed -i 's_/var/www/html_/var/www/docroot_' /etc/apache2/sites-enabled/000-default.conf && \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
