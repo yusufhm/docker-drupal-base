@@ -1,42 +1,50 @@
 default: build
 
-.PHONY: build release push
+.PHONY: build release push docker_build docker_push
 
-# Build Docker image
-build: docker_build
+.PHONY: docker_build_amd64 docker_build_arm64v8
 
-# Build and push Docker image
-release: docker_build docker_push
+# Build Docker image.
+build: docker_build_amd64 docker_build_arm64v8
 
-push: docker_push
+.PHONY: docker_push_amd64 docker_push_arm64v8
+
+push: docker_push_amd64 docker_push_arm64v8
+
+# Build and push Docker image & push manifest.
+release: build push docker_push_manifest
 
 DOCKER_IMAGE = yusufhm/drupal-base
 
 # Get the latest commit.
 GIT_COMMIT = $(strip $(shell git rev-parse --short HEAD))
 
-docker_build:
-	# Build amd64 image
+docker_build_amd64:
+	# Build amd64 image.
 	docker build \
   --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
   --build-arg VCS_URL=`git config --get remote.origin.url` \
   --build-arg VCS_REF=$(GIT_COMMIT) \
-  --build-arg ARCH=amd64/ \
+  --platform linux/amd64 \
 	-t $(DOCKER_IMAGE):amd64 .
 
-	# Build arm64v8 image
+docker_build_arm64v8:
+	# Build arm64v8 image.
 	docker build \
   --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
   --build-arg VCS_URL=`git config --get remote.origin.url` \
   --build-arg VCS_REF=$(GIT_COMMIT) \
-  --build-arg ARCH=arm64v8/ \
+  --platform linux/arm64/v8 \
 	-t $(DOCKER_IMAGE):arm64v8 .
 
-docker_push:
-	# Push to DockerHub
+docker_push_amd64:
+	# Push to DockerHub.
 	docker push $(DOCKER_IMAGE):amd64
+
+docker_push_arm64v8:
 	docker push $(DOCKER_IMAGE):arm64v8
 
+docker_push_manifest:
 	docker manifest create $(DOCKER_IMAGE):latest \
   --amend $(DOCKER_IMAGE):amd64 \
   --amend $(DOCKER_IMAGE):arm64v8
