@@ -24,7 +24,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Build and push
-        run: |
-          ls -l
-          ls `pwd`/Makefile
-          make release
+        run: make release
