@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
@@ -22,6 +25,6 @@ jobs:
       -
         name: Build and push
         run: |
-          ls `pwd`/Makefile
           ls -l
+          ls `pwd`/Makefile
           make release
