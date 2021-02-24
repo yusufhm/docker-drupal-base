@@ -1,6 +1,6 @@
 default: build
 
-.PHONY: build release push docker_build docker_push
+.PHONY: build release push
 
 .PHONY: docker_build_amd64 docker_build_arm64v8
 
@@ -11,8 +11,10 @@ build: docker_build_amd64 docker_build_arm64v8
 
 push: docker_push_amd64 docker_push_arm64v8
 
+push_manifest: docker_push_manifest_amd64 docker_push_manifest_arm64v8
+
 # Build and push Docker image & push manifest.
-release: build push docker_push_manifest
+release: build push push_manifest
 
 DOCKER_IMAGE = yusufhm/drupal-base
 
@@ -44,10 +46,15 @@ docker_push_amd64:
 docker_push_arm64v8:
 	docker push $(DOCKER_IMAGE):arm64v8
 
-docker_push_manifest:
+docker_push_manifest_amd64:
 	docker manifest create $(DOCKER_IMAGE):latest \
-  --amend $(DOCKER_IMAGE):amd64 \
   --amend $(DOCKER_IMAGE):arm64v8
+
+	docker manifest push $(DOCKER_IMAGE):latest
+
+docker_push_manifest_arm64v8:
+	docker manifest create $(DOCKER_IMAGE):latest \
+  --amend $(DOCKER_IMAGE):amd64
 
 	docker manifest push $(DOCKER_IMAGE):latest
 

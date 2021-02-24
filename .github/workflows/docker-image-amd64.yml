@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image - amd64
 
 on:
   push:
@@ -26,4 +26,4 @@ jobs:
           set -eux
           make docker_build_amd64
           make docker_push_amd64
-          make docker_push_manifest
+          make docker_push_manifest_amd64
