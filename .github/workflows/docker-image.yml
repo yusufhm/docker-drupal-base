@@ -22,4 +22,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Build and push
-        run: make release
+        run: |
+          set -eux
+          make docker_build_amd64
+          make docker_push_amd64
+          make docker_push_manifest
