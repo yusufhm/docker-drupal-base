@@ -22,5 +22,6 @@ jobs:
       -
         name: Build and push
         run: |
-          echo `pwd`
+          ls `pwd`/Makefile
+          ls -l
           make release
