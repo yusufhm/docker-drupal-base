@@ -1,5 +1,7 @@
 default: build
 
+.PHONY: build release push
+
 # Build Docker image
 build: docker_build
 
