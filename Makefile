@@ -32,7 +32,7 @@ docker_build_amd64:
 
 docker_build_arm64v8:
 	# Build arm64v8 image.
-	docker build --no-cache \
+	docker build \
   --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
   --build-arg VCS_URL=`git config --get remote.origin.url` \
   --build-arg VCS_REF=$(GIT_COMMIT) \
@@ -48,13 +48,13 @@ docker_push_arm64v8:
 
 docker_push_manifest_amd64:
 	docker manifest create $(DOCKER_IMAGE):latest \
-  --amend $(DOCKER_IMAGE):arm64v8
+  --amend $(DOCKER_IMAGE):amd64
 
 	docker manifest push $(DOCKER_IMAGE):latest
 
 docker_push_manifest_arm64v8:
 	docker manifest create $(DOCKER_IMAGE):latest \
-  --amend $(DOCKER_IMAGE):amd64
+  --amend $(DOCKER_IMAGE):arm64v8
 
 	docker manifest push $(DOCKER_IMAGE):latest
 
