@@ -49,13 +49,15 @@ docker_push_arm64v8:
 docker_push_manifest_amd64:
 	docker manifest create $(DOCKER_IMAGE):latest \
   --amend $(DOCKER_IMAGE):amd64
+  $(DOCKER_IMAGE):arm64v8
 
-	docker manifest push $(DOCKER_IMAGE):latest
+	docker manifest push --purge $(DOCKER_IMAGE):latest
 
 docker_push_manifest_arm64v8:
 	docker manifest create $(DOCKER_IMAGE):latest \
+  $(DOCKER_IMAGE):amd64
   --amend $(DOCKER_IMAGE):arm64v8
 
-	docker manifest push $(DOCKER_IMAGE):latest
+	docker manifest push --purge $(DOCKER_IMAGE):latest
 
 	# curl -X POST https://hooks.microbadger.com/images/yusufhm/drupal-base/CZUL-U9XeEcHvZgl3HzwbInlU5E=
