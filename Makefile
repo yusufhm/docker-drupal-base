@@ -30,7 +30,7 @@ docker_build_amd64:
 
 docker_build_arm64v8:
 	# Build arm64v8 image.
-	docker build \
+	docker build --no-cache \
   --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
   --build-arg VCS_URL=`git config --get remote.origin.url` \
   --build-arg VCS_REF=$(GIT_COMMIT) \
